@@ -30,7 +30,7 @@ global {
 			}
 			create fields;
 			create home;
-			create crop;
+			create crop_1;
 			create crop_2;
 			create crop_3;
 			create fence number: 2;
@@ -115,42 +115,27 @@ species crop{
 	image_file crop0_image_file <- image_file("../images/crop.png");
 
 //	geometry shape <- rectangle(500#m, 1200#m);
+	aspect default {
+//		draw shape color: #green border: #brown;
+		draw crop0_image_file size: 400#m;
+	}
+}
+
+species crop_1 parent: crop{
 	init {
 		location <- {500, 1700};
 	}
-	aspect default {
-//		draw shape color: #green border: #brown;
-		draw crop0_image_file size: 400#m;
-	}
-	
 }
-species crop_2{
-	
-	image_file crop0_image_file <- image_file("../images/crop.png");
-
-//	geometry shape <- rectangle(500#m, 1200#m);
+species crop_2 parent: crop{
 	init {
 		location <- {500, 1300};
 	}
-	aspect default {
-//		draw shape color: #green border: #brown;
-		draw crop0_image_file size: 400#m;
-	}
 	
 }
-species crop_3{
-	
-	image_file crop0_image_file <- image_file("../images/crop.png");
-
-//	geometry shape <- rectangle(500#m, 1200#m);
+species crop_3 parent: crop{
 	init {
 		location <- {500, 2100};
 	}
-	aspect default {
-//		draw shape color: #green border: #brown;
-		draw crop0_image_file size: 400#m;
-	}
-	
 }
 
 species fence{
@@ -355,7 +340,7 @@ experiment FarmSimulation {
 			species fields;
 			species home;
 			species crop_2;
-			species crop;
+			species crop_1;
 			species crop_3;
 			
 			species fence;
