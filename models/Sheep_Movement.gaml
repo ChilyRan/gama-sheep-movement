@@ -279,9 +279,7 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Go to Gate 1
-	// =========================
 
 	reflex go_to_gate
 		when: state = "going_to_gate" {
@@ -299,9 +297,7 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Enter Fence 1
-	// =========================
 
 	reflex enter_fence
 		when: state = "entering" {
@@ -317,9 +313,7 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Walk inside Fence 1
-	// =========================
 
 	reflex walk_inside_fence
 		when: state = "grazing" {
@@ -334,9 +328,7 @@ species sheep skills: [moving] {
 			speed: speed;
 	}
 
-	// =========================
 	// Appearance
-	// =========================
 
 	aspect default {
 
