@@ -21,30 +21,26 @@ global {
 	int current_hour <- 5;
     int current_minute <- 0;
     
+    // set energy 
+	float max_energy <- 100.0;
+	float max_pasture_eat <- 255.0;
+	float max_biomass_to_eat_per_hour <- 10.0;
+    
     point shelter_location <- {2250, 2500};
     shelter my_shelter;
     
 	geometry shape <- rectangle(farm_width#m, farm_height#m);
 	
 	init {
-			create farm{
-				shape <- world.shape;
-			}
-			create fields;
-			create home;
-			create crop;
-			create fence number: 2;
-			create gate number: 2;
-//			create pasture number: 300 {
-//				int column <- self.index mod 15;
-//				int row <- int(self.index / 15);
-//			
-//				location <- {
-//					1100 + column * 50,
-//					350 + row * 100
-//				};
-//			}
-		// create pasture in fence
+		create farm{
+			shape <- world.shape;
+		}
+		create fields;
+		create home;
+		create crop;
+		create fence number: 2;
+		create gate number: 2;
+			
 		loop f over: fence {
 			int cell_size <- 50;
 			int cols <- int(fence_width / cell_size) - 2;
@@ -62,6 +58,7 @@ global {
 				}
 			}
 		}
+		
 		create shelter{
 				my_shelter <- self;
 			}
@@ -69,6 +66,7 @@ global {
 			create river number: 2;
 			create sheep number: 50;
 		}
+		
 		reflex update_time {
 	        current_minute <- current_minute + 1;
 	
@@ -174,12 +172,10 @@ species gate{
 
 species pasture {
 
-	bool eaten <- false;
+	int green_level <- 255;
 
 	aspect default {
-		if (!eaten) {
-			draw shape color: #green;
-		}
+		draw shape color: rgb(0, green_level, 0);
 	}
 }
 
