@@ -45,13 +45,22 @@ global {
 //				};
 //			}
 		loop f over: fence {
-			create pasture number: 300 {
-				location <- {
-					f.location.x - fence_width / 2 + rnd(fence_width),
-					f.location.y - fence_height / 2 + rnd(fence_height)
-				};
+			int cell_size <- 50;
+			int cols <- int(fence_width / cell_size) - 2;
+			int rows <- int(fence_height / cell_size) - 2;
+			
+			loop col from: 0 to: cols - 1 {
+				loop row from: 0 to: rows - 1 {
+					create pasture {
+						location <- {
+							f.location.x - fence_width/2 + cell_size + col * cell_size,
+							f.location.y - fence_height/2 + cell_size + row * cell_size
+						};
+						shape <- circle(25#m);
+					}
+				}
 			}
-	}
+		}
 		create shelter{
 				my_shelter <- self;
 			}
@@ -105,6 +114,7 @@ species home{
 	}
 }
 
+// for decoration purposes
 species crop{
 	geometry shape <- rectangle(500#m, 1200#m);
 	init {
@@ -166,12 +176,8 @@ species pasture {
 	bool eaten <- false;
 
 	aspect default {
-
 		if (!eaten) {
-
-			draw circle(10#m)
-				color: #green
-				border: #green;
+			draw shape color: #green;
 		}
 	}
 }
