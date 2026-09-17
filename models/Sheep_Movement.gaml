@@ -20,9 +20,9 @@ global {
 	// 5 hours
 	int current_hour <- 5;
     int current_minute <- 0;
+    
     point shelter_location <- {2250, 2500};
     shelter my_shelter;
-    
     
 	geometry shape <- rectangle(farm_width#m, farm_height#m);
 	
@@ -44,6 +44,7 @@ global {
 //					350 + row * 100
 //				};
 //			}
+		// create pasture in fence
 		loop f over: fence {
 			int cell_size <- 50;
 			int cols <- int(fence_width / cell_size) - 2;
@@ -87,12 +88,12 @@ species farm {
 	
 	aspect default {
 		draw shape color: #white border: #brown;
-//		draw field0_image_file width: farm_width#m;
 	}
 	
 }
 
 species fields{
+	//import image
 	image_file field0_image_file <- image_file("../images/field.jpg");
 	init{
 		location<- {0,0};
@@ -193,7 +194,7 @@ species shelter {
 	}
 }
 
-
+// just design & layout, not have any action/reflex
 species river {
 
 
@@ -223,8 +224,6 @@ species sheep skills: [moving] {
 
 	string state <- "sleeping";
 
-	image_file sheep_image <- image_file("../images/sheep_3.jpeg");
-
 	
 	init{
 		location<- {2000+rnd(500), 50+rnd(300)};
@@ -240,10 +239,8 @@ species sheep skills: [moving] {
 	}
 
 
-	// Wake at 5:00
 	reflex sleep_until_5am
 		when: current_hour = 5 and not awake {
-
 		do wake_up();
 	}
 
@@ -271,7 +268,7 @@ species sheep skills: [moving] {
 
 	reflex enter_fence
 		when: state = "entering" {
-
+		//warning deprecated message, need to check later
 		do goto
 			target: {1500, 1300}
 			speed: speed;
@@ -292,7 +289,7 @@ species sheep skills: [moving] {
 			1100 + rnd(750),
 			350 + rnd(1900)
 		};
-
+		// warning deprecated message, need to check later
 		do goto
 			target: new_position
 			speed: speed;
