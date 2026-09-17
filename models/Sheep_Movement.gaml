@@ -7,6 +7,7 @@
 model FarmModel
 
 global {
+	// design layout
 	int farm_width <- 4000;
 	int farm_height <- 3000;
 	
@@ -15,7 +16,8 @@ global {
 	
 	int home_width <- 700;
 	int home_height <- 400;
-
+	
+	// 5 hours
 	int current_hour <- 5;
     int current_minute <- 0;
     point shelter_location <- {2250, 2500};
@@ -278,9 +280,8 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Walk inside Fence 1
-	// =========================
+	
 
 	reflex walk_inside_fence
 		when: state = "grazing" {
@@ -294,10 +295,8 @@ species sheep skills: [moving] {
 			target: new_position
 			speed: speed;
 	}
-
-	// =========================
+	
 	// Appearance
-	// =========================
 
 	aspect default {
 
