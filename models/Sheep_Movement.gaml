@@ -25,16 +25,16 @@ global {
 	geometry shape <- rectangle(farm_width#m, farm_height#m);
 	
 	init {
-			create farm{
-				shape <- world.shape;
-			}
-			create fields;
-			create home;
-			create crop_1;
-			create crop_2;
-			create crop_3;
-			create fence number: 2;
-			create gate number: 2;
+		create farm{
+			shape <- world.shape;
+		}
+		create fields;
+		create home;
+		create crop_1;
+		create crop_2;
+		create crop_3;
+		create fence number: 2;
+		create gate number: 2;
 //			create grass number: 300 {
 //				int column <- self.index mod 15;
 //				int row <- int(self.index / 15);
