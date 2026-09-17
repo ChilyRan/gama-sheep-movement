@@ -20,6 +20,7 @@ global {
 	// Time tracking
 	int current_hour <- 6;
     int current_minute <- 30;
+    bool is_grazing_time <- true;
     
 	geometry shape <- rectangle(farm_width#m, farm_height#m);
 	
@@ -68,6 +69,8 @@ global {
         if (current_hour = 24) {
             current_hour <- 0;
         }
+        
+        is_grazing_time <- (current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30);
     }
     
 
