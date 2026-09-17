@@ -17,17 +17,9 @@ global {
 	int home_width <- 700;
 	int home_height <- 400;
 	
-	// 5 hours
-	int current_hour <- 5;
-    int current_minute <- 0;
-    
-    // set energy 
-	float max_energy <- 100.0;
-	float max_pasture_eat <- 255.0;
-	float max_biomass_to_eat_per_hour_per_sheep <- 10.0;
-    
-    point shelter_location <- {2250, 2500};
-    shelter my_shelter;
+	// Time tracking
+	int current_hour <- 6;
+    int current_minute <- 30;
     
 	geometry shape <- rectangle(farm_width#m, farm_height#m);
 	
@@ -53,33 +45,32 @@ global {
 							f.location.x - fence_width/2 + cell_size + col * cell_size,
 							f.location.y - fence_height/2 + cell_size + row * cell_size
 						};
-						shape <- circle(25#m);
+						shape <- circle( 25#m);
 					}
 				}
 			}
 		}
 		
-		create shelter{
-				my_shelter <- self;
-			}
-			
-			create river number: 2;
-			create sheep number: 50;
-		}
-		
-		reflex update_time {
-	        current_minute <- current_minute + 1;
+		create shelter;
+		create river number: 2;
+		create sheep number: 50;
+		create dog number: 1;
+	}
 	
-	        if (current_minute = 60) {
-	            current_minute <- 0;
-	            current_hour <- current_hour + 1;
-	        }
+	reflex update_time {
+        current_minute <- current_minute + 1;
 	
-	        if (current_hour = 24) {
-	            current_hour <- 0;
-	        }
-	    }
+        if (current_minute = 60) {
+            current_minute <- 0;
+            current_hour <- current_hour + 1;
+        }
 	
+        if (current_hour = 24) {
+            current_hour <- 0;
+        }
+    }
+    
+
 }
 
 species farm {
@@ -216,104 +207,84 @@ species river {
 	}
 }
 
-species water{
+species dog skills: [moving] {
 	
+	float speed <- 1.5 #m/#s;
+	shelter shelter_cell;
+	
+	init {
+		location <- {1500, 100};
+	}
+	
+	// Guide sheep during grazing time
+	reflex guide_sheep when: (current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30) {
+		if (!empty(sheep)) {
+			point center <- sheep mean_of each.location;
+			do goto target: center speed: speed;
+		}
+	}
+	
+	// Return to shelter at night
+	reflex return_to_shelter when: not ((current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30)) {
+		do goto target: any_location_in(shelter_cell) speed: speed;
+	}
+
+	aspect default {
+		draw circle(15#m) color: #brown;
+	}
 }
 
 species sheep skills: [moving] {
 
-	bool visible <- false;
-	bool awake <- false;
-
+	int fence_index <- 0;
 	float speed <- 1.0 #m/#s;
-
-	string state <- "sleeping";
-
 	
-	init{
-		location<- {2000+rnd(500), 50+rnd(300)};
-	}
-
-
-	action wake_up() {
-
-		visible <- true;
-		awake <- true;
-
-		state <- "going_to_gate";
-	}
-
-
-	reflex sleep_until_5am
-		when: current_hour = 5 and not awake {
-		do wake_up();
-	}
-
-
-	// Go to Gate 1
-
-	reflex go_to_gate
-		when: state = "going_to_gate" {
-
-		//warning deprecated message, need to check later
-		do goto
-			target: gate[0]
-			speed: speed;
-
-		if (self distance_to gate[0] < 50#m) {
-
-			gate[0].open <- true;
-
-			state <- "entering";
+	shelter shelter_cell;
+	
+	// Grazing: eat nearby pasture
+	reflex graze when: (current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30) {
+		list<pasture> nearby <- pasture at_distance 30#m where (each.green_level > 0);
+		if (!empty(nearby)) {
+			pasture target <- nearby with_min_of (each distance_to self);
+			target.green_level <- max([target.green_level - 5, 0]);
 		}
 	}
-
-
-	// Enter Fence 1
-
-	reflex enter_fence
-		when: state = "entering" {
-		//warning deprecated message, need to check later
-		do goto
-			target: {1500, 1300}
-			speed: speed;
-
-		if (self distance_to {1500, 1300} < 100#m) {
-
-			state <- "grazing";
-		}
-	}
-
-
-	// Walk inside Fence 1
-
-	reflex walk_inside_fence
-		when: state = "grazing" {
-
+	
+	// Move randomly while grazing
+	reflex wander_when_grazing when: (current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30) {
 		point new_position <- {
-			1100 + rnd(750),
-			350 + rnd(1900)
+			fence[fence_index].location.x - fence_width/2 + rnd(fence_width),
+			fence[fence_index].location.y - fence_height/2 + rnd(fence_height)
 		};
-		// warning deprecated message, need to check later
-		do goto
-			target: new_position
-			speed: speed;
+		do goto target: new_position speed: speed;
 	}
 	
-	// Appearance
+	// Sleep in shelter at night
+	reflex go_to_shelter when: not ((current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30)) {
+		do goto target: any_location_in(shelter_cell) speed: speed;
+	}
+	
+	// Move to another fence when current is depleted
+	reflex switch_fence when: ((current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30)) {
+		int cell_size <- 50;
+		int cols <- int(fence_width / cell_size) - 2;
+		int rows <- int(fence_height / cell_size) - 2;
+		int total_cells <- cols * rows;
+		int depleted_cells <- length(pasture where (each.green_level <= 50));
+		if (depleted_cells >= total_cells * 0.8) {
+			int new_fence <- 1 - fence_index;
+			fence_index <- new_fence;
+			do goto target: fence[new_fence].location speed: speed;
+		}
+	}
 
 	aspect default {
-		
-		if (visible) {
-			
-			draw triangle(20)
-				color: #black;
-		}
+		draw triangle(20) color: #black;
 	}
 }
 
 
-experiment FarmSimulation {
+	experiment FarmSimulation {
 
 	output {
 		display map {
@@ -327,7 +298,7 @@ experiment FarmSimulation {
 			species shelter;
 			species river;
 			species sheep;
-			species water;
+			species dog;
 		}
 	}
 }
