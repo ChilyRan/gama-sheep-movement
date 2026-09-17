@@ -35,7 +35,7 @@ global {
 			create crop;
 			create fence number: 2;
 			create gate number: 2;
-//			create grass number: 300 {
+//			create pasture number: 300 {
 //				int column <- self.index mod 15;
 //				int row <- int(self.index / 15);
 //			
@@ -45,7 +45,7 @@ global {
 //				};
 //			}
 		loop f over: fence {
-			create grass number: 300 {
+			create pasture number: 300 {
 				location <- {
 					f.location.x - fence_width / 2 + rnd(fence_width),
 					f.location.y - fence_height / 2 + rnd(fence_height)
@@ -161,7 +161,7 @@ species gate{
 	}
 }
 
-species grass {
+species pasture {
 
 	bool eaten <- false;
 
@@ -242,13 +242,12 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Go to Gate 1
-	// =========================
 
 	reflex go_to_gate
 		when: state = "going_to_gate" {
 
+		//warning deprecated message, need to check later
 		do goto
 			target: gate[0]
 			speed: speed;
@@ -262,9 +261,7 @@ species sheep skills: [moving] {
 	}
 
 
-	// =========================
 	// Enter Fence 1
-	// =========================
 
 	reflex enter_fence
 		when: state = "entering" {
@@ -281,7 +278,6 @@ species sheep skills: [moving] {
 
 
 	// Walk inside Fence 1
-	
 
 	reflex walk_inside_fence
 		when: state = "grazing" {
@@ -299,9 +295,9 @@ species sheep skills: [moving] {
 	// Appearance
 
 	aspect default {
-
+		
 		if (visible) {
-
+			
 			draw triangle(20)
 				color: #black;
 		}
@@ -318,7 +314,7 @@ experiment FarmSimulation {
 			species home;
 			species crop;
 			species fence;
-			species grass;
+			species pasture;
 			species gate;
 			species shelter;
 			species river;
