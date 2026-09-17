@@ -24,7 +24,7 @@ global {
     // set energy 
 	float max_energy <- 100.0;
 	float max_pasture_eat <- 255.0;
-	float max_biomass_to_eat_per_hour <- 10.0;
+	float max_biomass_to_eat_per_hour_per_sheep <- 10.0;
     
     point shelter_location <- {2250, 2500};
     shelter my_shelter;
@@ -173,6 +173,11 @@ species gate{
 species pasture {
 
 	int green_level <- 255;
+	float growth_rate <- 10.0 / 1440; // 10 per day (1440 minutes)
+
+	reflex grow {
+		green_level <- min([int(green_level + growth_rate), 255]);
+	}
 
 	aspect default {
 		draw shape color: rgb(0, green_level, 0);
@@ -209,6 +214,10 @@ species river {
 	aspect default {
 		draw shape color: #blue border: #blue;
 	}
+}
+
+species water{
+	
 }
 
 species sheep skills: [moving] {
@@ -318,7 +327,7 @@ experiment FarmSimulation {
 			species shelter;
 			species river;
 			species sheep;
-			
+			species water;
 		}
 	}
 }
