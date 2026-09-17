@@ -241,6 +241,10 @@ species sheep skills: [moving] {
 	
 	shelter shelter_cell;
 	
+	init {
+		location <- any_location_in(shelter_cell);
+	}
+	
 	// Grazing: eat nearby pasture
 	reflex graze when: (current_hour > 6 and current_hour < 18) or (current_hour = 6 and current_minute >= 30) or (current_hour = 18 and current_minute < 30) {
 		list<pasture> nearby <- pasture at_distance 30#m where (each.green_level > 0);
