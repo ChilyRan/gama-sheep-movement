@@ -1,16 +1,15 @@
 /**
- * Name: SheepMovements
- 
- */
+* Name: Sheep Movement
+* Based on the internal empty template. 
+* Author: Virakboth NAY, Sopheak PREAB, Seavchhing KONG, Raingsey SAMOL, Chily RAN
+* Tags: 
+*/
+
 model SheepMovements
 
 global {
-	// space & time
 	geometry shape <- rectangle(800, 600);
 	float cell_size <- 4.0;
-	// A 10 #h step makes the model meaningless: at walk_speed 1 m/s a sheep covers 36 km
-	// in one cycle, and the FSM skips whole days between transitions. For a faster run,
-	// lower nb_sheep and shorten the batch "until:" instead.
 	float base_step <- 60 #s;
 	float step <- base_step;
 	date starting_date <- date([2026, 9, 1, 5, 0, 0]);
@@ -21,7 +20,6 @@ global {
 	int last_day <- -1;
 	float last_shift <- 0.0;
 
-	// parameters
 	string layout <- "realistic" among: ["realistic", "random", "clustered", "regular", "blocks"];
 	int nb_sheep <- 75;
 	int nb_dogs <- 0;
@@ -43,24 +41,24 @@ global {
 	float dog_speed <- 2.0 #m / #s;
 	float dog_walk_speed <- 1.0 #m / #s;
 
-	float perception <- 40.0 #m; 
+	float perception <- 40.0 #m;
 	float cohesion_distance <- 6.0 #m;
 	float separation_distance <- 2.5 #m;
 	float graze_search <- 20.0 #m;
-	float graze_min <- 0.15;              
-	float space_per_sheep <- 10.0;        
-	float flock_radius <- 40.0 #m;       
-	float regroup_distance <- 50.0 #m;   
+	float graze_min <- 0.15;
+	float space_per_sheep <- 10.0;
+	float flock_radius <- 40.0 #m;
+	float regroup_distance <- 50.0 #m;
 
 	// water: the herd drinks TOGETHER, so it never splits between grass at one end of the
 	// field and water at the other. A single sheep only breaks away if it gets really thirsty.
-	float thirst_trigger <- 0.7;          // above this a sheep wants a drink
-	float herd_water_share <- 0.35;       // once this share of the herd is thirsty, the whole herd walks to water
-	float lone_thirst <- 1.6;             // a single sheep only leaves the herd for water above this
+	float thirst_trigger <- 0.7;
+	float herd_water_share <- 0.35;
+	float lone_thirst <- 1.6;
 
 	// shepherd dog
-	float herd_stray_factor <- 1.3;       // past this multiple of flock_radius a sheep counts as a stray
-	float herd_push_distance <- 30.0 #m;  // a sheep this close to a herding dog turns back to the herd
+	float herd_stray_factor <- 1.3;
+	float herd_push_distance <- 30.0 #m;
 	float dog_call_hour <- 5.0;
 	float dog_gather_hour <- 18.5;
 	point kennel <- {445, 45};
@@ -77,34 +75,34 @@ global {
 	float stray_run_speed <- 3.0 #m / #s;  // stray dog when approaching / chasing
 	float stray_start_hour <- 8.0;         // stray dog only attacks between these hours
 	float stray_end_hour <- 17.0;
-	float chase_duration <- 10 #mn;        // how long one chase lasts
-	float stray_rest <- 2 #h;              // rest between attacks
-	float fear_radius <- 30.0 #m;          // sheep closer than this to a stray dog flee
+	float chase_duration <- 10 #mn;
+	float stray_rest <- 2 #h;
+	float fear_radius <- 30.0 #m;
 	float flee_speed <- 2.5 #m / #s;
-	float flee_distance <- 60.0 #m;        // how far a sheep runs before choosing a new escape point
-	float scatter_angle <- 70.0;           // random deviation of the escape direction -> flock breaks apart
-	float alarm_range <- 80.0 #m;          // panic can spread only when a stray dog is this close
-	float alarm_distance <- 8.0 #m;        // a sheep sees a fleeing neighbour within this distance
-	float alarm_prob <- 0.5;               // chance per cycle to join a fleeing neighbour
-	float calm_duration <- 5 #mn;          // time without a dog nearby before regrouping
-	float regroup_search <- 60.0 #m;       // how far a calm sheep looks for a group to rejoin
+	float flee_distance <- 60.0 #m;
+	float scatter_angle <- 70.0;
+	float alarm_range <- 80.0 #m;
+	float alarm_distance <- 8.0 #m;
+	float alarm_prob <- 0.5;
+	float calm_duration <- 5 #mn;
+	float regroup_search <- 60.0 #m;
 
 	// dog fight: shepherd dog defends the flock against the stray dog
-	float guard_range <- 150.0 #m;         // shepherd reacts to an attacking stray dog closer than this
-	float defend_speed <- 3.5 #m / #s;     // shepherd running at the intruder
-	float fight_distance <- 20.0 #m;       // the two dogs start fighting when this close
-	float fight_duration <- 3 #mn;         // how long a dog fight lasts
-	float fight_fear_radius <- 45.0 #m;    // sheep closer than this to a fight flee
-	float defend_success_prob <- 0.8;      // chance that the shepherd wins
-	float chased_cooldown_factor <- 3.0;   // a beaten stray dog rests this many times longer
-	float chase_off_distance <- 150.0 #m;  // shepherd stops chasing when the intruder is this far from the flock
+	float guard_range <- 150.0 #m;
+	float defend_speed <- 3.5 #m / #s;
+	float fight_distance <- 20.0 #m;
+	float fight_duration <- 3 #mn;
+	float fight_fear_radius <- 45.0 #m;
+	float defend_success_prob <- 0.8;
+	float chased_cooldown_factor <- 3.0;
+	float chase_off_distance <- 150.0 #m;
 
-	// ------------------------------------------------------------ csv output
+	//  csv output
 	// NOTE: do not name these *_file — "csv_file" and friends are built-in GAML types.
-	bool save_csv <- false;                // the batch experiments switch this on
-	int save_every <- 240;                 // save a row every N cycles (240 = every 2 simulated hours)
-	int next_save <- 240;                  // next cycle to save on; reset to save_every in init
-	int run_id <- 0;                       // filled in init: identifies one simulation in the CSV
+	bool save_csv <- false;
+	int save_every <- 240;
+	int next_save <- 240;
+	int run_id <- 0;
 	string results_path <- "../results/layout_comparison.csv";
 
 	// images (UI from Sheep_Movement.gaml)
@@ -115,26 +113,26 @@ global {
 	image_file shelter_img <- image_file("../images/shee_shelter.png");
 	image_file river_img <- image_file("../images/river.png");
 	image_file sheep_img <- image_file("../images/sheep.png");
-	image_file dog_img <- image_file("../images/dog.png");           // our shepherd dog
-	image_file stray_img <- image_file("../images/stray_dog.png");    // the stray dog that scares the flock
+	image_file dog_img <- image_file("../images/dog.png");
+	image_file stray_img <- image_file("../images/stray_dog.png");
 	list<point> crop_pts <- [{40, 110}, {40, 275}, {40, 430}];
 	list<point> patch_centres <- [];
 	list<list<cell>> patch_cells <- [];
 
 	float w_grass <- 0.8;
-	float w_cohesion <- 2.5;  
+	float w_cohesion <- 2.5;
 	float w_separation <- 1.2;
-	float w_random <- 0.35; 
-	float w_herd <- 2.0; 
+	float w_random <- 0.35;
+	float w_herd <- 2.0;
 
 	float thirst_rate <- 0.0015;
 	// grazing is balanced against regrowth: with 500 sheep the flock eats 2.0 grass units per cycle
 	// while the field regrows 3.4, so the pasture as a whole survives, but the patch the flock is
 	// standing on is grazed down in about 3 h and needs ~14 h to recover -> the flock must keep moving.
 	float eat_rate <- 0.004;         
-	float grass_regrowth <- 0.006;  
+	float grass_regrowth <- 0.006;
 	float trample_attraction <- 0.08;
-	float trample_decay <- 0.998;      
+	float trample_decay <- 0.998;
 	float min_cost <- 0.15;
 	float track_threshold <- 5.0;
 
@@ -163,24 +161,24 @@ global {
 	list<cell> pen_cells;
 	map<cell, float> cell_weights;
 	string daily_zone <- "field1";
-	bool herd_at_water <- false;     
-	point herd_water;               
-	point herd_goal;                 
-	float herd_speed <- 0.6 #m / #s; 
+	bool herd_at_water <- false;
+	point herd_water;
+	point herd_goal;
+	float herd_speed <- 0.6 #m / #s;
 	point flock_centre;
 	list<string> out_states <- ["to_pasture", "grazing", "to_grass", "to_water", "drinking", "fleeing", "regrouping"];
 
-	// ------------------------------------------------------------ indicators
+	//  indicators
 	float track_ratio <- 0.0;
 	float top5_share <- 0.0;
-	int flee_events <- 0;            
-	int dog_fights <- 0;             
-	int fights_won <- 0;             
-	float mean_nn_distance <- 0.0;   
+	int flee_events <- 0;
+	int dog_fights <- 0;
+	int fights_won <- 0;
+	float mean_nn_distance <- 0.0;
 
 	init {
-		run_id <- rnd(1, 1000000);   // drawn here, not in the declaration: one value per simulation
-		next_save <- save_every;     // in case an experiment overrides save_every
+		run_id <- rnd(1, 1000000);
+		next_save <- save_every;
 
 		create obstacle with: [kind::"river", shape::rectangle({20, 520}, {772, 548}), color::rgb(60, 140, 220)];
 //		create obstacle with: [kind::"river", shape::rectangle({745, 15}, {772, 548}), color::rgb(60, 140, 220)];
@@ -224,7 +222,6 @@ global {
 
 		if grass_patches { do create_grass_patches(); }
 
-		// the flock covers an area proportional to its size (e.g. 500 sheep x 25 m² -> radius ~63 m)
 		flock_radius <- sqrt(nb_sheep * space_per_sheep / #pi);
 		regroup_distance <- flock_radius + 10.0;
 
@@ -237,7 +234,7 @@ global {
 		create stray_dog number: nb_stray_dogs with: [location::den, rest_until::rnd(stray_rest)];
 	}
 
-	// ------------------------------------------------------------ construction helpers
+	//  construction helpers
 	action build_fence(geometry zone_geom, list<point> gates) {
 		geometry g <- zone_geom.contour;
 		loop gp over: gates { g <- g - (circle(7.0) at_location gp); }
@@ -331,7 +328,6 @@ global {
 		}
 	}
 
-	// NEW: rich grass patches surrounded by poor pasture, inside each fenced field
 	action create_grass_patches() {
 		list<list<cell>> zones <- [field1_cells, field2_cells];
 		loop zc over: zones {
@@ -349,10 +345,6 @@ global {
 		}
 	}
 
-	// flock-level decisions
-	// Pick the next grazing area: the richest grass NEAR the herd, so it drifts from one patch to
-	// the next instead of jumping across the field. The rich grass patches are always candidates,
-	// which is why the herd now actually walks onto them.
 	action choose_grazing_area() {
 		list<cell> zc <- (daily_zone = "field1") ? field1_cells : field2_cells;
 		if !empty(zc) {
@@ -374,7 +366,6 @@ global {
 		}
 	}
 
-	// the cells the herd is standing on
 	list<cell> herd_cells -> ((daily_zone = "field1") ? field1_cells : field2_cells)
 		where (flock_centre != nil and (each.location distance_to flock_centre) < flock_radius);
 
@@ -402,7 +393,6 @@ global {
 		do choose_grazing_area();
 	}
 
-	// the whole herd walks to water together and afterwards moves to a fresh patch of grass
 	reflex herd_water_trip when: every(10 #cycles) {
 		list<sheep> out <- sheep where (each.state in ["grazing", "to_grass", "to_water", "drinking"]);
 		if !empty(out) {
@@ -420,7 +410,6 @@ global {
 		}
 	}
 
-	// the herd stays together, so it has to move on as one once its own ground is grazed out
 	reflex herd_needs_new_patch when: every(20 #cycles) and !herd_at_water {
 		list<cell> here <- herd_cells;
 		if !empty(here) and mean(here collect each.grass) < graze_min * 1.5 {
@@ -438,7 +427,7 @@ global {
 		step <- action_now ? base_step / slow_factor : base_step;
 	}
 
-	// ------------------------------------------------------------ landscape dynamics
+	//  landscape dynamics
 	reflex landscape_dynamics when: every(10 #cycles) {
 		ask cell {
 			trampling <- trampling * (trample_decay ^ dt);
@@ -462,7 +451,6 @@ global {
 		top5_share <- (total > 0 and k > 0) ? sum(copy_between(sorted, 0, k)) / total : 0.0;
 	}
 
-	// flock spread: rises when a stray dog breaks the flock, falls again when sheep regroup
 	action compute_spread() {
 		list<sheep> out <- sheep where (each.state in out_states);
 		mean_nn_distance <- (length(out) < 2) ? 0.0
@@ -473,7 +461,7 @@ global {
 
 	reflex flock_spread when: every(10 #cycles) { do compute_spread; }
 
-	// ------------------------------------------------------------ csv export
+	//  csv export
 	// Rows are written by the simulation itself while it runs. A reflex in the batch
 	// experiment would only run once the simulations are already disposed, so nothing
 	// would be saved. Saving periodically also means a run stopped early still leaves data.
@@ -493,7 +481,7 @@ global {
 	// NOT proportional to simulated time. Plot against sim_day.
 	reflex save_results when: save_csv and cycle >= next_save {
 		next_save <- cycle + save_every;
-		do compute_indicators;      // refresh, instead of saving a value up to 120 cycles old
+		do compute_indicators;
 		do compute_spread;
 		write "saved run " + run_id + " cycle " + cycle + " day " + (time / #day);
 		save [run_id, layout, grass_patches, nb_dogs, nb_stray_dogs,
@@ -504,7 +492,7 @@ global {
 	}
 }
 
-// ================================================================ grid
+//  grid
 grid cell width: 200 height: 150 neighbors: 8 {
 	bool blocked <- false;
 	bool rich <- false;   // NEW: part of a rich grass patch
@@ -527,7 +515,7 @@ grid cell width: 200 height: 150 neighbors: 8 {
 	}
 }
 
-// ================================================================ static species
+//  static species
 species obstacle {
 	string kind;
 	bool blocking <- true;
@@ -866,7 +854,7 @@ species sheep skills: [moving] control: fsm {
 	}
 }
 
-// ================================================================ shepherd dog (Extension 3)
+//  shepherd dog (Extension 3)
 species dog skills: [moving] control: fsm {
 	point target;
 	stray_dog intruder;
@@ -1049,7 +1037,7 @@ species dog skills: [moving] control: fsm {
 	}
 }
 
-// ================================================================ stray dog that scares the flock (Extension 3b)
+//  stray dog that scares the flock (Extension 3b)
 // resting (den, cooldown) -> approaching (a grazing sheep) -> chasing (nearest sheep) -> leaving (back to den)
 species stray_dog skills: [moving] control: fsm {
 	point target;
@@ -1259,11 +1247,7 @@ experiment grass_and_blocks type: gui parent: sheep_simulation {
 	}
 }
 
-// ---------------------------------------------------------------- batch experiments
-// Each simulation writes its own rows (see the save_results reflex in global): a reflex
-// here would only run after the simulations have already been disposed.
-// The ../results folder must exist beforehand — GAMA does not create it — and each file
-// is APPENDED to, so delete it before re-running the same experiment.
+// batch experiments
 
 // baseline: does obstacle distribution shape pathways?   5 x 5 = 25 runs
 experiment layouts_baseline type: batch repeat: 5 keep_seed: false until: time >= 5 #day {
