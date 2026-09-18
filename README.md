@@ -11,4 +11,15 @@
 - open the GAMA app
 - Run the experiment
 
+## About the project:
+
+- Research question:
+  - How do sheep move around to avoid obstacles?
+  - How do sheep find and move toward available grass?
+  - How do sheep change their behavior when they encounter a dog and how do they regroup afterward?
+  - How do grazing affect the sheep movement between grass areas ?
+  - How does grass regrowth affect where sheep move and graze?
+
 ## Modeling:
+
+## Sheep behavior:
