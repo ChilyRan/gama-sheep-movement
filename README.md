@@ -14,13 +14,4 @@
 ## About the project:
 
 - Research questions:
-  - How do sheep move around to avoid obstacles?
-  - How do sheep find and move toward available grass?
-  - How do sheep change their behavior when they encounter a dog and how do they regroup afterward?
-  - How do grazing affect the sheep movement between grass areas ?
-  - How does grass regrowth affect where sheep move and graze?
-
-## Modeling:
-
-## Sheep behavior:
-
+  - How do external herding/chasing and the rate of local resource depletion affect the herd and the efficiency of sheep to move?
