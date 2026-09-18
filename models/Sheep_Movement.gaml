@@ -336,6 +336,7 @@ experiment FarmSimulation {
 
 	output {
 		display map {
+			
 			species farm;
 			species fields;
 			species home;
