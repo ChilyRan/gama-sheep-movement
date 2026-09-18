@@ -13,7 +13,7 @@
 
 ## About the project:
 
-- Research question:
+- Research questions:
   - How do sheep move around to avoid obstacles?
   - How do sheep find and move toward available grass?
   - How do sheep change their behavior when they encounter a dog and how do they regroup afterward?
@@ -23,3 +23,4 @@
 ## Modeling:
 
 ## Sheep behavior:
+
